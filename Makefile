@@ -4,15 +4,14 @@ CXX_FLAGS = -std=c++1z -Wconversion -Wall -Werror -Wextra -pedantic
 OPT = -O3 -DNDEBUG
 DEBUG = -g3 -DDEBUG
 EXECUTABLE = scrabble
-OBJECTS = dictionary
 
 # Build optimized executable.
-scrabble : $(EXECUTABLE).cpp $(OBJECTS).cpp
-	$(CXX) $(CXX_FLAGS) $(OPT) $(OBJECTS).cpp $(EXECUTABLE).cpp -o $(EXECUTABLE)
+scrabble : $(EXECUTABLE).cpp
+	$(CXX) $(CXX_FLAGS) $(OPT) $(EXECUTABLE).cpp -o $(EXECUTABLE)
 
 # Build with debug features.
-debug : $(EXECUTABLE).cpp $(OBJECTS).cpp
-	$(CXX) $(CXX_FLAGS) $(DEBUG) $(OBJECTS).cpp $(EXECUTABLE).cpp -o $(EXECUTABLE)_debug
+debug : $(EXECUTABLE).cpp
+	$(CXX) $(CXX_FLAGS) $(DEBUG) $(EXECUTABLE).cpp -o $(EXECUTABLE)_debug
 
 
 # Remove executable and all runtime outputs.
