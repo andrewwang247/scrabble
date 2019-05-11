@@ -6,10 +6,8 @@
 # not add to version control.
 
 # Custom ignores for this project.
-encrypt
-decrypt
-encrypt_debug
-decrypt_debug
+scrabble
+scrabble_debug
 
 # Exectuables and debug files.
 *.exe
