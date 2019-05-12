@@ -10,8 +10,6 @@
 #include <limits>
 using namespace std;
 
-bool pred (char c) { return !isalpha(c); }
-
 /**
  * Starting with an empty and reserve pset vector, generates
  * the in-order power set of the line string in pset.
@@ -55,7 +53,7 @@ int main(int argc, char **argv) {
 	line.reserve(128);
 	while (getline(cin, line)) {
 		// Get rid of anything that is not a letter.
-		line.erase(remove_if(line.begin(), line.end(), pred), line.end());
+		line.erase(remove_if(line.begin(), line.end(), [](char c) { return !isalpha(c); }), line.end());
 		// Store a copy of the original ordering of the line.
 		const string original_line = line;
 		// Sort line in alphabetical format.
@@ -71,7 +69,7 @@ int main(int argc, char **argv) {
 		size_t shortest_length = numeric_limits<size_t>::max();
 
 		// Print the original letters.
-		cout << "Original letters: " << original_line << endl;
+		cout << "Original " << original_line.size() << " letters: " << original_line << endl;
 		// For each entry in pset, check if it's in the hash table.
 		for (const string &s : pset) {
 			// If we find it in dict, print out the words in the vector!
@@ -101,21 +99,33 @@ int main(int argc, char **argv) {
 		
 		// Print possible words.
 		sort(possible.begin(), possible.end());
-		cout << '\t' << possible.size() << " possible words: ";
-		for (const string &s : possible) cout << s << ' ';
-		cout << endl;
+		if (possible.empty()) {
+			cout << "No possible words found." << endl;
+		} else {
+			cout << '\t' << possible.size() << " possible words: ";
+			for (const string &s : possible) cout << s << ' ';
+			cout << endl;
+		}
 
 		// Print shortest words.
 		sort(shortest.begin(), shortest.end());
-		cout << '\t' << shortest.size() << " shortest words of length " << shortest_length << ": ";
-		for (const string &s : shortest) cout << s << ' ';
-		cout << endl;
+		if (shortest.empty()) {
+			cout << "No shortest words found." << endl;
+		} else {
+			cout << '\t' << shortest.size() << " shortest words of length " << shortest_length << ": ";
+			for (const string &s : shortest) cout << s << ' ';
+			cout << endl;
+		}
 
 		// Print shortest words.
 		sort(longest.begin(), longest.end());
-		cout << '\t' << longest.size() << " longest words of length " << longest_length << ": ";
-		for (const string &s : longest) cout << s << ' ';
-		cout << endl;
+		if (longest.empty()) {
+			cout << "No longest words found." << endl;
+		} else {
+			cout << '\t' << longest.size() << " longest words of length " << longest_length << ": ";
+			for (const string &s : longest) cout << s << ' ';
+			cout << endl;
+		}
 	}
 }
 
