@@ -11,14 +11,14 @@
 using namespace std;
 
 /**
- * Starting with an empty and reserve pset vector, generates
+ * Starting with an empty and pset, generates
  * the in-order power set of the line string in pset.
  * ! REQUIRES: line is sorted and pset is empty.
  * @param line : The line for which we generate the power set of.
- * @param pset : The vector where we store the power set of line.
+ * @param pset : The set where we store the power set of line.
  * * Complexity O(2^n).
  */
-void generate_power_set ( const string &line, vector<string> &pset );
+void generate_power_set ( const string &line, unordered_set<string> &pset );
 
 int main(int argc, char **argv) {
 	// stdio optimization + preliminary checks.
@@ -60,7 +60,7 @@ int main(int argc, char **argv) {
 		sort(line.begin(), line.end());
 
 		// Generate the power set of line.
-		vector<string> pset;
+		unordered_set<string> pset;
 		generate_power_set(line, pset);
 
 		vector<string> possible, longest, shortest;
@@ -129,12 +129,12 @@ int main(int argc, char **argv) {
 	}
 }
 
-void generate_power_set ( const string &line, vector<string> &pset ) {
+void generate_power_set ( const string &line, unordered_set<string> &pset ) {
 	// To get the power set, we iterate over the binary numbers from 0 to 2^n - 1.
 	const size_t n = line.size();
 	const size_t two_pow_n = (size_t) pow(2, n);
+	pset.reserve(two_pow_n);
 
-	unordered_set<string> subwords;
 	for (size_t i = 0; i < two_pow_n; ++i) {
 		string substring;
 		substring.reserve(n);
@@ -146,7 +146,6 @@ void generate_power_set ( const string &line, vector<string> &pset ) {
 		}
 
 		// Add this substring to the set (auto remove duplicates).
-		subwords.insert(substring);
+		pset.insert(substring);
 	}
-	pset.assign(subwords.begin(), subwords.end());
 }
