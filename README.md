@@ -15,4 +15,4 @@ Next, we read from standard input line by line. Each line should contain a query
 
 ## Output
 
-After finding all possible words that are a multi-subset of the line, we print the line to standard output followed by a list of all the words that it can generate. One output line for one input line.
+After finding all possible words that are a multi-subset of the line, we print the possible words as well as the shortest/longest words you can form using those letters.
