@@ -11,8 +11,10 @@ First, the file reads the words_file into a hash map. In particular, we want to 
 
 ### String Parsing
 
-Next, we read from standard input line by line. Each line should contain a query in the form of a string of characters. Our goal is to find every word in our map that can be formed using those letters. For a query of n letters, there are 2^n subsets of those letters, so the runtime is exponential. However, we expect n to be small, so this should not be an issue. We sort the input string at the very beginning and iterate through its in-order power set, searching the hash map for each subset.
+Next, we read from standard input line by line. Each line should contain a query in the form of a string of characters. Our goal is to find every word in our map that can be formed using those letters. All non-alphanumeric characters are discarded and letters are lower-cased.
+
+For a query of n letters, there are 2^n subsets of those letters, so the runtime is exponential. However, we expect n to be small, so this should not be an issue. We sort the input string at the very beginning and iterate through its in-order power set, searching the hash map for each subset.
 
 ## Output
 
-After finding all possible words that are a multi-subset of the line, we print the possible words as well as the shortest/longest words you can form using those letters.
+After finding all possible words that are a multi-subset of the line, we print the possible words as well as the longest words you can form using those letters.
