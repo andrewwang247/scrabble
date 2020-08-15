@@ -1,9 +1,10 @@
 # Personal Makefile for One Time Pad.
-CXX = g++
-CXX_FLAGS = -std=c++1z -Wconversion -Wall -Werror -Wextra -pedantic
-OPT = -O3 -DNDEBUG
-DEBUG = -g3 -DDEBUG
-EXECUTABLE = scrabble
+CXX := g++ -std=c++17
+CXX_FLAGS := -Wall -Werror -Wextra -Wconversion -pedantic -Wfloat-equal -Wduplicated-branches -Wduplicated-cond -Wshadow -Wdouble-promotion -Wundef 
+OPT := -O3 -DNDEBUG
+DEBUG := -g3 -DDEBUG
+
+EXECUTABLE := scrabble
 
 # Build optimized executable.
 scrabble : $(EXECUTABLE).cpp
@@ -11,10 +12,10 @@ scrabble : $(EXECUTABLE).cpp
 
 # Build with debug features.
 debug : $(EXECUTABLE).cpp
-	$(CXX) $(CXX_FLAGS) $(DEBUG) $(EXECUTABLE).cpp -o $(EXECUTABLE)_debug
+	$(CXX) $(CXX_FLAGS) $(DEBUG) $(EXECUTABLE).cpp -o $(EXECUTABLE)
 
 
 # Remove executable and all runtime outputs.
 .PHONY : clean
 clean : 
-	rm -f $(EXECUTABLE) $(EXECUTABLE)_debug
+	rm -f $(EXECUTABLE)

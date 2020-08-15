@@ -7,7 +7,6 @@
 
 # Custom ignores for this project.
 scrabble
-scrabble_debug
 
 # Exectuables and debug files.
 *.exe
