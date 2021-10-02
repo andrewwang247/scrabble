@@ -6,6 +6,7 @@ Scrabble solver.
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <string>
 #include <type_traits>
 #include <unordered_map>
@@ -13,10 +14,10 @@ Scrabble solver.
 #include <vector>
 using std::cin;
 using std::cout;
-using std::endl;
 using std::ifstream;
 using std::ios_base;
 
+using std::map;
 using std::string;
 using std::unordered_map;
 using std::unordered_set;
@@ -30,40 +31,61 @@ using std::transform;
 /**
  * A power function for integers.
  * Avoids floating point ambiguity.
+ * @param base The base of the power.
+ * @param exponent The power to raise to.
+ * @returns base^exponent.
  */
 template <typename T>
 T power(T base, T exponent);
 
 /**
- * Returns bits matchings original.
+ * Applies mask to string.
+ * @param original The full string.
+ * @param bits The values to take.
+ * @returns The masked original string.
  */
-string subset(const string &original, __uint64_t bits);
+string subset(const string &original, uint64_t bits);
 
 /**
- * Starting with an empty and pset, generates
- * the in-order power set of the line string.
- * * Complexity O(2^n).
+ * Generates the in-order power set of the line string.
+ * Complexity O(2^n).
+ * @param line The full set to generate a power set of.
+ * @returns The power set of line.
  */
 unordered_set<string> generate_power_set(const string &line);
 
 /**
  * Ensures command line arguments are valid. Retrieves input from
  * the list of all words and returns a sorted dictionary.
+ * @param argc The number of arguments.
+ * @param argv The argument list.
+ * @returns Validated command line arguments.
  */
-unordered_map<string, vector<string> > get_input(int argc, char **argv);
+unordered_map<string, vector<string>> get_input(int argc, char **argv);
 
 /**
  * Removes non alphanumeric characters and sets everything to lower case.
+ * @param line The original input line.
+ * @returns A cleaned up line.
  */
 string process_line(string line);
 
 /**
- * Returns as subset of pset containing
- * the possible words in the dictionary.
+ * Finds the possible words in the dictionary that matches pset.
+ * @param pset A set of words.
+ * @param dict The reference dictionary.
+ * @returns The subset of pset containing the possible words in the dictionary.
  */
 vector<string> possible_words(
     const unordered_set<string> &pset,
-    const unordered_map<string, vector<string> > &dict);
+    const unordered_map<string, vector<string>> &dict);
+
+/**
+ * Buckets strings by their length.
+ * @param possible A list of words.
+ * @returns A mapping of lengths to word lists.
+ */
+map<size_t, vector<string>> categorize_lengths(const vector<string> &possible);
 
 /**
  * Returns the longest possible words.
@@ -78,7 +100,7 @@ int main(int argc, char **argv) {
   for (string line; getline(cin, line);) {
     cout << "\nORIGINAL INPUT: " << line << '\n';
     const auto processed = process_line(line);
-    // There are 64 bits in a __uint64_t type.
+    // There are 64 bits in a uint64_t type.
     if (processed.length() > 64) {
       throw runtime_error("Lines can have at most 64 characters.");
     }
@@ -93,18 +115,20 @@ int main(int argc, char **argv) {
       continue;
     }
 
-    const auto long_words = longest(possible);
+    const auto cat_len = categorize_lengths(possible);
 
     // Print possible words.
     cout << "\nTHERE ARE " << possible.size()
          << " POSSIBLE WORD(S) USING THESE LETTERS.\n";
-    for (const string &s : possible) cout << s << ' ';
+    for (const auto &len_vec : cat_len) {
+      cout << '\t' << len_vec.second.size() << " OF LENGTH " << len_vec.first
+           << ": ";
+      for (const auto &word : len_vec.second) {
+        cout << word << ' ';
+      }
+      cout << '\n';
+    }
     cout << '\n';
-
-    cout << "\nTHE LONGEST ONE(S) HAVE LENGTH " << long_words.front().length()
-         << ".\n";
-    for (const string &s : long_words) cout << s << ' ';
-    cout << "\n" << endl;
   }
 }
 
@@ -119,10 +143,10 @@ T power(T base, T exponent) {
   return exponent % 2 == 0 ? tmp_sq : base * tmp_sq;
 }
 
-string subset(const string &original, __uint64_t bits) {
+string subset(const string &original, uint64_t bits) {
   string substring;
   // Check up to n bits.
-  for (__uint64_t j = 0; j < original.length(); ++j) {
+  for (uint64_t j = 0; j < original.length(); ++j) {
     // If bit j is 1, we include the j th letter
     if (bits & (1 << j)) substring.push_back(original[j]);
   }
@@ -131,19 +155,19 @@ string subset(const string &original, __uint64_t bits) {
 
 unordered_set<string> generate_power_set(const string &line) {
   // To get the power set, we iterate over the binary numbers from 0 to 2^n - 1.
-  const __uint64_t n = line.size();
-  const __uint64_t two_pow_n = power(static_cast<__uint64_t>(2), n);
+  const uint64_t n = line.size();
+  const uint64_t two_pow_n = power(static_cast<uint64_t>(2), n);
 
   unordered_set<string> pset;
   pset.reserve(two_pow_n);
 
-  for (__uint64_t i = 0; i < two_pow_n; ++i) {
+  for (uint64_t i = 0; i < two_pow_n; ++i) {
     pset.emplace(subset(line, i));
   }
   return pset;
 }
 
-unordered_map<string, vector<string> > get_input(int argc, char **argv) {
+unordered_map<string, vector<string>> get_input(int argc, char **argv) {
   if (argc != 2) {
     throw runtime_error(
         "Error: usage ./scrabble words_file < strings_file > output_file");
@@ -153,7 +177,7 @@ unordered_map<string, vector<string> > get_input(int argc, char **argv) {
   ifstream fin(argv[1]);
 
   // Initialize the word dictionary and insert strings.
-  unordered_map<string, vector<string> > dict;
+  unordered_map<string, vector<string>> dict;
   for (string word; fin >> word;) {
     // Use sorted word as key.
     string key = word;
@@ -176,7 +200,7 @@ string process_line(string line) {
 
 vector<string> possible_words(
     const unordered_set<string> &pset,
-    const unordered_map<string, vector<string> > &dict) {
+    const unordered_map<string, vector<string>> &dict) {
   vector<string> possible;
 
   /**
@@ -189,22 +213,16 @@ vector<string> possible_words(
     // Otherwise, the dictionary contains this substring.
     possible.insert(possible.end(), words.begin(), words.end());
   }
-  sort(possible.begin(), possible.end());
   return possible;
 }
 
-vector<string> longest(const vector<string> &possible) {
-  __uint64_t longest_length = 0;
-  vector<string> lo;
-  for (const auto &str : possible) {
-    const auto n = str.length();
-    if (n > longest_length) {
-      lo.clear();
-      lo.emplace_back(str);
-      longest_length = n;
-    } else if (n == longest_length) {
-      lo.emplace_back(str);
-    }
+map<size_t, vector<string>> categorize_lengths(const vector<string> &possible) {
+  map<size_t, vector<string>> cat_len;
+  for (const auto &word : possible) {
+    cat_len[word.size()].emplace_back(word);
   }
-  return lo;
+  for (auto &len_vec : cat_len) {
+    sort(len_vec.second.begin(), len_vec.second.end());
+  }
+  return cat_len;
 }
